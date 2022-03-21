@@ -71,6 +71,7 @@ class APP(FUNCOES):
         self.tela()
         self.componentes()
         self.combo_categoria()
+        self.carregarTREEVIEW()
         self.janela.mainloop()
     def tela(self):
         self.janela = Tk()
@@ -82,7 +83,6 @@ class APP(FUNCOES):
         self.posX = self.largura_screen/2 - self.largura/2
         self.posY = self.altura_screen/2 - self.altura/2
         self.janela.geometry("%dx%d+%d+%d" % (self.largura, self.altura, self.posX, self.posY))
-        self.janela.title("Controle Financeiro")
         self.janela.configure(bg='#B0E0E6')
         # Não permitir Redimensionamento
         self.janela.resizable(width=0,height=0)
@@ -116,11 +116,17 @@ class APP(FUNCOES):
         self.columns = ('col01', 'col02', 'col03', 'col04', 'col05')
         self.tree = Treeview(self.janela, columns=self.columns, show='headings')
         # definindo Títulos
-        self.tree.heading('col01', text='ID')
-        self.tree.heading('col02', text='Descrição')
-        self.tree.heading('col03', text='Categoria')
-        self.tree.heading('col04', text='Data')
-        self.tree.heading('col05', text='Valor')
+        self.tree.heading('col01', text='ID', anchor='center')
+        self.tree.heading('col02', text='Descrição', anchor='center')
+        self.tree.heading('col03', text='Categoria', anchor='center')
+        self.tree.heading('col04', text='Data', anchor='center')
+        self.tree.heading('col05', text='Valor', anchor='center')
+        # Configurando tamanho de Cada Coluna
+        self.tree.column('col01',width=30,minwidth=30)
+        self.tree.column('col02',width=30,minwidth=30)
+        self.tree.column('col03',width=30,minwidth=30)
+        self.tree.column('col04',width=30,minwidth=30)
+        self.tree.column('col05',width=15,minwidth=15)
         # add a scrollbar
         self.scrollbar = Scrollbar(self.janela, orient=VERTICAL, command=self.tree.yview)
         self.tree.configure(yscroll=self.scrollbar.set)
@@ -157,7 +163,15 @@ class APP(FUNCOES):
             self.conn.commit()
             self.desconectar_bd()
             self.limpaCAMPOS()
+            self.carregarTREEVIEW()
             showinfo('Cadastro','Cadastro Realizado com Sucesso!!!')
+    def carregarTREEVIEW(self):
+        self.conectarBD
+        self.cur = self.conn.cursor()
+        self.cur.execute('SELECT id_mov, mov_descricao, descri_cat,mov_data,mov_valor FROM vw_movimentacao;')
+        self.rows = self.cur.fetchall()
+        for (id,descricao,cat,data,valor) in self.rows:
+            self.tree.insert('',END,values=(id,descricao,cat,data,valor))
 
 
 
